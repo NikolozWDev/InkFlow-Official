@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .models import Note, CustomUser
 from .serializers import NoteSerializer, EmailTokenObtainPairSerializer, RegisterSerializer, ShowUserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.http import JsonResponse
 
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -70,3 +71,7 @@ class UpdateNoteView(generics.UpdateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Note.objects.filter(author=user)
+
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})

@@ -11,6 +11,7 @@ import Navbar from './components/Navbar'
 import AboutPage from './pages/AboutPage'
 import LoadingOverlay from './components/LoadingOverlay'
 import Toast from './components/Toast'
+import useBackendAwake from './hooks/useBackendAwake'
 
 function Logout() {
     localStorage.removeItem(ACCESS_TOKEN)
@@ -18,6 +19,7 @@ function Logout() {
 }
 
 const App = () => {
+    const { isAwake, error, retry } = useBackendAwake()
     const [loading, setLoading] = useState(false)
     const [loadingMessage, setLoadingMessage] = useState("Loading...")
     const [toast, setToast] = useState(null)
@@ -34,6 +36,26 @@ const App = () => {
     const stopLoading = useCallback(() => {
         setLoading(false)
     }, [])
+
+    if (!isAwake && !error) {
+        return (
+            <LoadingOverlay message="Waking up the server… This may take up to a minute." />
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+                <p className="text-xl mb-4">{error}</p>
+                <button
+                    onClick={retry}
+                    className="px-6 py-2 bg-blue-600 rounded hover:bg-blue-700 transition"
+                >
+                    Retry
+                </button>
+            </div>
+        )
+    }
 
     return (
         <Router>
@@ -59,4 +81,5 @@ const App = () => {
         </Router>
     )
 }
+
 export default App
