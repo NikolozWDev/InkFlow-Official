@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { ACCESS_TOKEN } from './constants'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from './constants'
 import AuthProvider, { useAuth } from './AuthProvider'
 import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
@@ -15,6 +15,7 @@ import useBackendAwake from './hooks/useBackendAwake'
 
 function Logout() {
     localStorage.removeItem(ACCESS_TOKEN)
+    localStorage.removeItem(REFRESH_TOKEN)
     return <Navigate to="/login" />
 }
 

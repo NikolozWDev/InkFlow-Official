@@ -34,27 +34,28 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate, get_user_model
+
+User = get_user_model()
+
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True)
+    username_field = User.EMAIL_FIELD
 
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
 
-        if not email or not password:
-            raise serializers.ValidationError("Email and password required")
-        
-        try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
-            raise serializers.ValidationError("User with this email does not exist")
+        if email and password:
+            user = authenticate(request=self.context.get('request'),
+                                email=email, password=password)
+            if not user:
+                raise serializers.ValidationError('Invalid email or password.')
+        else:
+            raise serializers.ValidationError('Must include "email" and "password".')
 
-        user = authenticate(email=email, password=password)
-        if not user:
-            raise serializers.ValidationError("Invalid credentials")
-        
-        return super().validate({"email": user.email, "password": password})
+        self.user = user
+        return super().validate(attrs)
 
 
 class ShowUserSerializer(serializers.ModelSerializer):

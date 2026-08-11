@@ -7,6 +7,7 @@ from .models import Note, CustomUser
 from .serializers import NoteSerializer, EmailTokenObtainPairSerializer, RegisterSerializer, ShowUserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
 
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -73,5 +74,7 @@ class UpdateNoteView(generics.UpdateAPIView):
         return Note.objects.filter(author=user)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def health_check(request):
     return JsonResponse({"status": "ok"})
